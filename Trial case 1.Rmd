@@ -1,0 +1,91 @@
+---
+title: "Complex tress"
+author: "Emil Hvitfeldt Hansen"
+date: "2/3/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(ehlib)
+```
+
+## functions
+
+```{r}
+complex_length <- function(z) {
+  sqrt(Re(z) ^ 2 + Im(z) ^ 2)
+}
+
+complex_norm <- function(z) {
+  z / complex_length(z)
+}
+
+zigzag_tree <- function(n_trunk = 4, smoothness, lambda) {
+
+  #trunks <- rep(1, n_trunk + 1)
+  trunks <- rztpois(n_trunk + 1, lambda = lambda)
+  swings <- runif(n_trunk + 1, -1, 1)
+  tree <- complex(n_trunk + 1)
+  
+  tree[2] <- 1i
+  
+  for(i in seq_len(n_trunk)[-(1)]) {
+    tree[i + 1] <- tree[i] + complex_norm(tree[i] * complex_norm(smoothness + swings[i] * 1i)) * trunks[i]
+  }
+  
+  tibble(x = Re(tree)[-1],
+         y = Im(tree)[-1],
+         x_from = Re(tree)[-(n_trunk + 1)],
+         y_from = Im(tree)[-(n_trunk + 1)],
+         swing = swings[-(n_trunk + 1)])
+}
+
+zigzag_forrest <- function(n_trunk, n_tree, smoothness = 0.5, lambda = 1) {
+  sample_n <- rep(n_trunk, ceiling(n_tree / length(n_trunk)))[seq_len(n_tree)] + 1
+  
+  map2_df(sample_n, seq_len(n_tree), 
+          ~ zigzag_tree(.x, 
+                        smoothness = smoothness, 
+                        lambda = lambda) %>% 
+            mutate(tree = .y) %>% slice(-1))
+}
+```
+
+
+```{r}
+n <- 25
+zigzag_forrest(10, n) %>%
+  ggplot(aes(x, y, group = tree, color = tree)) +
+  geom_path(alpha = 0.7) +
+  theme_void() + 
+  scale_color_distiller(palette = "Greens") +
+  guides(color = "none")
+```
+
+```{r}
+n <- 100
+data <- zigzag_forrest(10, n) %>%
+  mutate(row_n = row_number())
+
+data %>%
+  ggplot(aes(group = row_n, color = tree)) +
+  geom_curve(data = data %>% filter(swing > 0),
+             aes(x = x_from, y = y_from, xend = x, yend = y), 
+             alpha = 0.3, curvature = -0.3) +
+  geom_curve(data = data %>% filter(swing < 0),
+             aes(x = x_from, y = y_from, xend = x, yend = y), 
+             alpha = 0.3, curvature = 0.3) +
+  theme_void() + 
+  #scale_color_distiller(palette = "rainbow") +
+  scale_colour_gradientn(colours = rainbow(n)) +
+  guides(color = "none") +
+  theme(plot.background = element_rect(fill = 'black', colour = 'black'))
+```

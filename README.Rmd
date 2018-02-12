@@ -1,0 +1,65 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# Tree GenViz
+
+# Packages
+
+```{r}
+library(tidyverse)
+```
+
+# Loading custom functions
+
+```{r}
+sapply(paste0("R/", list.files("R/")), source, .GlobalEnv)
+```
+
+```{r}
+angle_fun <- function(n, min_angle = 10, max_angle = 20) {
+  sign <- sample(c(-1, 1), size = n, replace = TRUE) / 360 * 2 * pi
+  size <- sample(min_angle:max_angle, size = n, replace = TRUE)
+  sign * size
+}
+length_fun <- function(n) rpois(n = n, lambda = 20)
+```
+
+## Example
+
+```{r}
+treeViz(5, angle_fun, length_fun)
+```
+
+Try of single branch
+
+```{r}
+treeViz(1, angle_fun, length_fun) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group)) +
+  geom_curve(curvature = 0) +
+  coord_fixed() +
+  theme_void()
+```
+
+Whole tree
+
+```{r}
+treeViz(25, angle_fun, length_fun) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = group)) +
+  geom_curve(curvature = 0, alpha = 0.5) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```

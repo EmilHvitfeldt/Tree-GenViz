@@ -12,6 +12,12 @@ knitr::opts_chunk$set(
 ```
 # Tree GenViz
 
+Todo
+
+- variable branch peice length []
+- Make work with data instead of Gen []
+- Save direction as variable []
+
 # Packages
 
 ```{r}
@@ -58,7 +64,7 @@ treeViz(25, angle_fun, length_fun) %>%
   ggplot(aes(x = x_from, xend = x_to,
              y = y_from, yend = y_to, 
              group = group, color = group)) +
-  geom_curve(curvature = 0, alpha = 0.5) +
+  geom_curve(curvature = 0, alpha = 0.4) +
   coord_fixed() +
   theme_void() +
   guides(color = "none")

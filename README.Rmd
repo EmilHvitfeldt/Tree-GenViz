@@ -16,7 +16,7 @@ Todo
 
 - variable branch peice length [✓]
 - Make work with data instead of Gen []
-- Save direction as variable []
+- Save direction as variable [✓]
 
 # Packages
 
@@ -60,7 +60,32 @@ treeViz(1, angle_fun, length_fun) %>%
   theme_void()
 ```
 
+```{r}
+treeViz(1, angle_fun, length_fun) %>%
+  mutate(turn_col = angle > 0) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = turn_col)) +
+  geom_curve(curvature = 0) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```
+
+
 Whole tree
+
+```{r}
+treeViz(25, angle_fun, length_fun) %>%
+    mutate(turn_col = angle > 0) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = turn_col)) +
+  geom_curve(curvature = 0, alpha = 0.4) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```
 
 ```{r}
 treeViz(25, angle_fun, length_fun) %>%

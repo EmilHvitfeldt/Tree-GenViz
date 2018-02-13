@@ -7,7 +7,7 @@ Todo
 
 -   variable branch peice length \[✓\]
 -   Make work with data instead of Gen \[\]
--   Save direction as variable \[\]
+-   Save direction as variable \[✓\]
 
 Packages
 ========
@@ -51,20 +51,20 @@ Example
 
 ``` r
 treeViz(5, angle_fun, length_fun)
-#> # A tibble: 119 x 5
-#>     x_from    x_to y_from  y_to group
-#>      <dbl>   <dbl>  <dbl> <dbl> <int>
-#>  1  0       0.174    1.00  1.98     1
-#>  2  0.174   0.0345   1.98  2.98     1
-#>  3  0.0345 -0.275    2.98  3.93     1
-#>  4 -0.275  -0.257    3.93  4.93     1
-#>  5 -0.257  -0.482    4.93  5.90     1
-#>  6 -0.482  -0.447    5.90  6.90     1
-#>  7 -0.447  -0.706    6.90  7.87     1
-#>  8 -0.706  -1.16     7.87  8.76     1
-#>  9 -1.16   -1.44     8.76  9.72     1
-#> 10 -1.44   -1.38     9.72 10.7      1
-#> # ... with 109 more rows
+#> # A tibble: 105 x 6
+#>     x_from    x_to y_from  y_to group  angle
+#>      <dbl>   <dbl>  <dbl> <dbl> <int>  <dbl>
+#>  1  0      -0.326    1.00  1.95     1  0.332
+#>  2 -0.326  -0.841    1.95  2.80     1  0.209
+#>  3 -0.841  -1.08     2.80  3.77     1 -0.297
+#>  4 -1.08   -1.10     3.77  4.77     1 -0.227
+#>  5 -1.10   -0.808    4.77  5.73     1 -0.314
+#>  6 -0.808  -0.338    5.73  6.61     1 -0.192
+#>  7 -0.338  -0.0962   6.61  7.58     1  0.244
+#>  8 -0.0962  0.358    7.58  8.47     1 -0.227
+#>  9  0.358   1.04     8.47  9.20     1 -0.279
+#> 10  1.04    1.84     9.20  9.81     1 -0.175
+#> # ... with 95 more rows
 ```
 
 Try of single branch
@@ -81,7 +81,35 @@ treeViz(1, angle_fun, length_fun) %>%
 
 ![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
+``` r
+treeViz(1, angle_fun, length_fun) %>%
+  mutate(turn_col = angle > 0) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = turn_col)) +
+  geom_curve(curvature = 0) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
 Whole tree
+
+``` r
+treeViz(25, angle_fun, length_fun) %>%
+    mutate(turn_col = angle > 0) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = turn_col)) +
+  geom_curve(curvature = 0, alpha = 0.4) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 ``` r
 treeViz(25, angle_fun, length_fun) %>%
@@ -94,7 +122,7 @@ treeViz(25, angle_fun, length_fun) %>%
   guides(color = "none")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ``` r
 angle_fun <- function(n, min_angle = 20, max_angle = 40) {
@@ -116,4 +144,4 @@ treeViz(25, angle_fun, length_fun, twig_fun) %>%
   guides(color = "none")
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-9-1.png)

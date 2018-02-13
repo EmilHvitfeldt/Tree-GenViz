@@ -3,6 +3,12 @@
 Tree GenViz
 ===========
 
+Todo
+
+-   variable branch peice length \[✓\]
+-   Make work with data instead of Gen \[\]
+-   Save direction as variable \[\]
+
 Packages
 ========
 
@@ -16,6 +22,7 @@ library(tidyverse)
 #> ── Conflicts ── tidyverse_conflicts() ──
 #> ✖ dplyr::filter() masks stats::filter()
 #> ✖ dplyr::lag()    masks stats::lag()
+library(ehlib)
 ```
 
 Loading custom functions
@@ -35,6 +42,8 @@ angle_fun <- function(n, min_angle = 10, max_angle = 20) {
   sign * size
 }
 length_fun <- function(n) rpois(n = n, lambda = 20)
+
+twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 2)
 ```
 
 Example
@@ -42,20 +51,20 @@ Example
 
 ``` r
 treeViz(5, angle_fun, length_fun)
-#> # A tibble: 105 x 5
-#>    x_from   x_to y_from  y_to group
-#>     <dbl>  <dbl>  <dbl> <dbl> <int>
-#>  1  0     -0.191   1.00  1.98     1
-#>  2 -0.191 -0.691   1.98  2.85     1
-#>  3 -0.691 -1.46    2.85  3.49     1
-#>  4 -1.46  -2.37    3.49  3.90     1
-#>  5 -2.37  -3.10    3.90  4.58     1
-#>  6 -3.10  -3.63    4.58  5.43     1
-#>  7 -3.63  -4.33    5.43  6.15     1
-#>  8 -4.33  -5.20    6.15  6.63     1
-#>  9 -5.20  -6.17    6.63  6.89     1
-#> 10 -6.17  -7.03    6.89  7.39     1
-#> # ... with 95 more rows
+#> # A tibble: 119 x 5
+#>     x_from    x_to y_from  y_to group
+#>      <dbl>   <dbl>  <dbl> <dbl> <int>
+#>  1  0       0.174    1.00  1.98     1
+#>  2  0.174   0.0345   1.98  2.98     1
+#>  3  0.0345 -0.275    2.98  3.93     1
+#>  4 -0.275  -0.257    3.93  4.93     1
+#>  5 -0.257  -0.482    4.93  5.90     1
+#>  6 -0.482  -0.447    5.90  6.90     1
+#>  7 -0.447  -0.706    6.90  7.87     1
+#>  8 -0.706  -1.16     7.87  8.76     1
+#>  9 -1.16   -1.44     8.76  9.72     1
+#> 10 -1.44   -1.38     9.72 10.7      1
+#> # ... with 109 more rows
 ```
 
 Try of single branch
@@ -79,10 +88,32 @@ treeViz(25, angle_fun, length_fun) %>%
   ggplot(aes(x = x_from, xend = x_to,
              y = y_from, yend = y_to, 
              group = group, color = group)) +
-  geom_curve(curvature = 0, alpha = 0.5) +
+  geom_curve(curvature = 0, alpha = 0.4) +
   coord_fixed() +
   theme_void() +
   guides(color = "none")
 ```
 
 ![](README_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+``` r
+angle_fun <- function(n, min_angle = 20, max_angle = 40) {
+  sign <- sample(c(-1, 1), size = n, replace = TRUE) / 360 * 2 * pi
+  size <- sample(min_angle:max_angle, size = n, replace = TRUE)
+  sign * size
+}
+length_fun <- function(n) rpois(n = n, lambda = 20)
+
+twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 1)
+
+treeViz(25, angle_fun, length_fun, twig_fun) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = group)) +
+  geom_curve(curvature = 0, alpha = 0.4) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-7-1.png)

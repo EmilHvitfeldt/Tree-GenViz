@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 
 Todo
 
-- variable branch peice length []
+- variable branch peice length [✓]
 - Make work with data instead of Gen []
 - Save direction as variable []
 
@@ -22,6 +22,7 @@ Todo
 
 ```{r}
 library(tidyverse)
+library(ehlib)
 ```
 
 # Loading custom functions
@@ -37,6 +38,8 @@ angle_fun <- function(n, min_angle = 10, max_angle = 20) {
   sign * size
 }
 length_fun <- function(n) rpois(n = n, lambda = 20)
+
+twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 2)
 ```
 
 ## Example
@@ -69,3 +72,24 @@ treeViz(25, angle_fun, length_fun) %>%
   theme_void() +
   guides(color = "none")
 ```
+
+```{r}
+angle_fun <- function(n, min_angle = 20, max_angle = 40) {
+  sign <- sample(c(-1, 1), size = n, replace = TRUE) / 360 * 2 * pi
+  size <- sample(min_angle:max_angle, size = n, replace = TRUE)
+  sign * size
+}
+length_fun <- function(n) rpois(n = n, lambda = 20)
+
+twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 1)
+
+treeViz(25, angle_fun, length_fun, twig_fun) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = group)) +
+  geom_curve(curvature = 0, alpha = 0.4) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none")
+```
+

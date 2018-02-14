@@ -31,12 +31,15 @@ library(ehlib)
 sapply(paste0("R/", list.files("R/")), source, .GlobalEnv)
 ```
 
+Function for random variable angle, variable branch length, and variable twig twig length. 
+
 ```{r}
 angle_fun <- function(n, min_angle = 10, max_angle = 20) {
   sign <- sample(c(-1, 1), size = n, replace = TRUE) / 360 * 2 * pi
   size <- sample(min_angle:max_angle, size = n, replace = TRUE)
   sign * size
 }
+
 length_fun <- function(n) rpois(n = n, lambda = 20)
 
 twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 2)
@@ -48,7 +51,9 @@ twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 2)
 treeViz(5, angle_fun, length_fun)
 ```
 
-Try of single branch
+### Single branch
+
+Minimal branch.
 
 ```{r}
 treeViz(1, angle_fun, length_fun) %>%
@@ -59,6 +64,8 @@ treeViz(1, angle_fun, length_fun) %>%
   coord_fixed() +
   theme_void()
 ```
+
+With colors depending on direction of path.
 
 ```{r}
 treeViz(1, angle_fun, length_fun) %>%
@@ -72,20 +79,9 @@ treeViz(1, angle_fun, length_fun) %>%
   guides(color = "none")
 ```
 
+### Whole tree
 
-Whole tree
-
-```{r}
-treeViz(25, angle_fun, length_fun) %>%
-    mutate(turn_col = angle > 0) %>%
-  ggplot(aes(x = x_from, xend = x_to,
-             y = y_from, yend = y_to, 
-             group = group, color = turn_col)) +
-  geom_curve(curvature = 0, alpha = 0.4) +
-  coord_fixed() +
-  theme_void() +
-  guides(color = "none")
-```
+Minimal tree. Color by branch id.
 
 ```{r}
 treeViz(25, angle_fun, length_fun) %>%
@@ -98,6 +94,23 @@ treeViz(25, angle_fun, length_fun) %>%
   guides(color = "none")
 ```
 
+Tree. Color depending of direction.
+
+```{r}
+treeViz(100, angle_fun, length_fun) %>%
+    mutate(turn_col = angle > 0) %>%
+  ggplot(aes(x = x_from, xend = x_to,
+             y = y_from, yend = y_to, 
+             group = group, color = turn_col)) +
+  geom_curve(curvature = 0, alpha = 0.3) +
+  coord_fixed() +
+  theme_void() +
+  guides(color = "none") +
+  scale_color_manual(values = c("#A3BE8C", "#BF616A"))
+```
+
+Variable twig length.
+
 ```{r}
 angle_fun <- function(n, min_angle = 20, max_angle = 40) {
   sign <- sample(c(-1, 1), size = n, replace = TRUE) / 360 * 2 * pi
@@ -108,7 +121,7 @@ length_fun <- function(n) rpois(n = n, lambda = 20)
 
 twig_fun <- function(n) ehlib::rztpois(n = n, lambda = 1)
 
-treeViz(25, angle_fun, length_fun, twig_fun) %>%
+treeViz(50, angle_fun, length_fun, twig_fun) %>%
   ggplot(aes(x = x_from, xend = x_to,
              y = y_from, yend = y_to, 
              group = group, color = group)) +

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 
 Todo
 
-- variable branch peice length [✓]
+- variable branch piece length [✓]
 - Make work with data instead of Gen []
 - Save direction as variable [✓]
 
